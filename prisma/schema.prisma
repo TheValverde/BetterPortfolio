@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id               String    @id @default(cuid())
+  title            String
+  description      String
+  longDescription  String?   @map("long_description")
+  startDate        DateTime  @map("start_date")
+  endDate          DateTime? @map("end_date")
+  status           ProjectStatus
+  technologies     String[]
+  category         ProjectCategory
+  client           String?
+  role             String
+  responsibilities String[]
+  impact           String?
+  images           String[]
+  videoUrl         String?   @map("video_url")
+  githubUrl        String?   @map("github_url")
+  liveUrl          String?   @map("live_url")
+  featured         Boolean   @default(false)
+  order            Int       @default(0)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  @@map("projects")
+}
+
+enum ProjectStatus {
+  COMPLETED
+  ONGOING
+  PLANNED
+}
+
+enum ProjectCategory {
+  AI
+  REAL_TIME_GRAPHICS
+  WEB
+  MOBILE
+  OTHER
+}
+
+model ContactSubmission {
+  id          String                @id @default(cuid())
+  name        String
+  email       String
+  message     String
+  status      SubmissionStatus      @default(UNREAD)
+  priority    SubmissionPriority    @default(NORMAL)
+  isResponded Boolean               @default(false) @map("is_responded")
+  notes       String?               // Admin notes about the submission
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedAt   DateTime              @updatedAt @map("updated_at")
+
+  @@map("contact_submissions")
+}
+
+enum SubmissionStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+enum SubmissionPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String   // Will be hashed
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}

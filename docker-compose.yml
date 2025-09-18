@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  portfolio:
+    build: .
+    ports:
+      - "3017:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - DATABASE_URL=postgresql://portfolio:portfolio123@postgres:5432/portfolio
+    volumes:
+      - ./public:/app/public:ro
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - portfolio-network
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5437:5432"  # Permanent port for MCP content management
+    environment:
+      - POSTGRES_DB=portfolio
+      - POSTGRES_USER=portfolio
+      - POSTGRES_PASSWORD=portfolio123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - portfolio-network
+
+  # Future services for AI integration
+  # mcp-server:
+  #   build: ./mcp-server
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - MCP_SERVER_PORT=8000
+  #   networks:
+  #     - portfolio-network
+
+  # ai-services:
+  #   build: ./ai-services
+  #   ports:
+  #     - "8001:8001"
+  #   environment:
+  #     - AI_SERVICE_PORT=8001
+  #   networks:
+  #     - portfolio-network
+
+networks:
+  portfolio-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  portfolio-data:

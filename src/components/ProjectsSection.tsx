@@ -234,15 +234,12 @@ export default function ProjectsSection() {
           </div>
 
           {/* Action Buttons */}
-          <div className="text-center mt-12 space-x-4">
+          <div className="text-center mt-12">
             <button 
               onClick={handleViewAllProjects}
               className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
             >
               {showAllProjects ? 'Show Featured Only' : 'View All Projects'}
-            </button>
-            <button className="border border-primary text-primary px-8 py-3 rounded-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-colors">
-              View Timeline
             </button>
           </div>
         </div>

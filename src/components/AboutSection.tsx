@@ -99,7 +99,7 @@ export default function AboutSection() {
             <div className="relative">
               <div className="relative w-full h-96 lg:h-[500px] rounded-lg overflow-hidden">
                 <Image
-                  src="/images/your-photo.webp"
+                  src="/images/hugo-valverde.webp"
                   alt="Your Name - AI Engineer"
                   fill
                   className="object-cover"

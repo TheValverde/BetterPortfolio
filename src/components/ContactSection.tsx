@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Linkedin, Github, Youtube, Twitter } from 'lucide-react';
 
 export default function ContactSection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -79,22 +80,22 @@ export default function ContactSection() {
     {
       name: 'LinkedIn',
       url: process.env.NEXT_PUBLIC_LINKEDIN_URL!,
-      icon: '💼'
+      icon: Linkedin
     },
     {
       name: 'GitHub',
       url: process.env.NEXT_PUBLIC_GITHUB_URL!,
-      icon: '💻'
+      icon: Github
     },
     {
-      name: 'Twitter',
+      name: 'X',
       url: process.env.NEXT_PUBLIC_TWITTER_URL!,
-      icon: '🐦'
+      icon: Twitter
     },
     {
       name: 'YouTube',
       url: process.env.NEXT_PUBLIC_YOUTUBE_URL!,
-      icon: '📺'
+      icon: Youtube
     }
   ];
 
@@ -206,18 +207,21 @@ export default function ContactSection() {
               <div className="bg-background/50 p-6 rounded-lg border border-border">
                 <h4 className="font-semibold text-foreground mb-4">Follow me</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  {socialLinks.map((link) => (
-                    <a
-                      key={link.name}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors"
-                    >
-                      <span className="text-2xl">{link.icon}</span>
-                      <span className="text-foreground">{link.name}</span>
-                    </a>
-                  ))}
+                  {socialLinks.map((link) => {
+                    const IconComponent = link.icon;
+                    return (
+                      <a
+                        key={link.name}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors"
+                      >
+                        <IconComponent className="w-6 h-6 text-primary" />
+                        <span className="text-foreground">{link.name}</span>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
 

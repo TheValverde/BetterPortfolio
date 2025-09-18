@@ -58,19 +58,19 @@ export async function POST(request: NextRequest) {
     try {
       // Create transporter for Zoho Mail
       const transporter = nodemailer.createTransport({
-        host: 'smtp.zoho.com',
-        port: 587,
+        host: process.env.SMTP_HOST || 'smtp.zoho.com',
+        port: parseInt(process.env.SMTP_PORT || '587'),
         secure: false, // true for 465, false for other ports
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
         },
       });
 
       // Email to you (the portfolio owner)
       await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: process.env.CONTACT_EMAIL,
+        from: process.env.SMTP_FROM,
+        to: process.env.SMTP_FROM, // Send to yourself
         subject: `New Portfolio Contact: ${body.name}`,
         html: `
           <h2>New Contact Form Submission</h2>
@@ -85,16 +85,16 @@ export async function POST(request: NextRequest) {
 
       // Auto-reply to the person who submitted the form
       await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+        from: process.env.SMTP_FROM,
         to: body.email,
-        subject: `Thank you for contacting ${process.env.FULL_NAME || 'Your Name'}`,
+        subject: `Thank you for contacting ${process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name'}`,
         html: `
           <h2>Thank you for reaching out!</h2>
           <p>Hi ${body.name},</p>
           <p>Thank you for your message. I've received your inquiry and will get back to you as soon as possible.</p>
-          <p>Best regards,<br>${process.env.FULL_NAME || 'Your Name'}<br>${process.env.TITLE || 'Your Title'}<br>${process.env.PHONE_NUMBER || '(XXX) XXX-XXXX'}<br>${process.env.WEBSITE_URL || 'yourwebsite.com'}</p>
+          <p>Best regards,<br>${process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name'}<br>${process.env.NEXT_PUBLIC_TITLE || 'Your Title'}<br>${process.env.NEXT_PUBLIC_PHONE_NUMBER || '(XXX) XXX-XXXX'}<br>${process.env.NEXT_PUBLIC_WEBSITE_URL || 'yourwebsite.com'}</p>
           <hr>
-          <p><em>This is an automated response from ${process.env.WEBSITE_URL || 'yourwebsite.com'}</em></p>
+          <p><em>This is an automated response from ${process.env.NEXT_PUBLIC_WEBSITE_URL || 'yourwebsite.com'}</em></p>
         `,
       });
 

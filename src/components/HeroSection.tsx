@@ -41,8 +41,8 @@ export default function HeroSection() {
         >
           {/* Main Heading */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6">
-            <span className="text-foreground">Your</span>{' '}
-            <span className="text-primary">Name</span>
+            <span className="text-foreground">{process.env.NEXT_PUBLIC_FULL_NAME?.split(' ')[0] || 'Your'}</span>{' '}
+            <span className="text-primary">{process.env.NEXT_PUBLIC_FULL_NAME?.split(' ')[1] || 'Name'}</span>
           </h1>
 
           {/* Subtitle */}

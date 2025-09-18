@@ -38,7 +38,7 @@ export default function Navigation() {
             href="/"
             className="text-2xl font-bold text-foreground hover:text-primary transition-colors"
           >
-{process.env.FULL_NAME || 'Your Name'}
+{process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name'}
           </Link>
 
           {/* Desktop Navigation */}

@@ -26,6 +26,7 @@ model Project {
   responsibilities String[]
   impact           String?
   images           String[]
+  previewImage     String?   @map("preview_image")
   videoUrl         String?   @map("video_url")
   githubUrl        String?   @map("github_url")
   liveUrl          String?   @map("live_url")

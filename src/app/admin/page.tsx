@@ -257,6 +257,12 @@ export default function AdminDashboard() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <div className="flex gap-4">
+            <Link
+              href="/admin/projects"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"
+            >
+              Manage Projects
+            </Link>
             <button
               onClick={() => fetchSubmissions()}
               className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"

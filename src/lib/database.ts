@@ -26,6 +26,7 @@ function convertPrismaProject(prismaProject: any): Project {
     responsibilities: prismaProject.responsibilities,
     impact: prismaProject.impact,
     images: prismaProject.images,
+    previewImage: prismaProject.previewImage,
     videoUrl: prismaProject.videoUrl,
     githubUrl: prismaProject.githubUrl,
     liveUrl: prismaProject.liveUrl,
@@ -144,6 +145,7 @@ export async function createProject(projectData: Omit<Project, 'id' | 'createdAt
         responsibilities: projectData.responsibilities,
         impact: projectData.impact,
         images: projectData.images || [],
+        previewImage: projectData.previewImage,
         videoUrl: projectData.videoUrl,
         githubUrl: projectData.githubUrl,
         liveUrl: projectData.liveUrl,
@@ -175,6 +177,7 @@ export async function updateProject(id: string, updates: Partial<Project>): Prom
     if (updates.responsibilities) updateData.responsibilities = updates.responsibilities;
     if (updates.impact) updateData.impact = updates.impact;
     if (updates.images) updateData.images = updates.images;
+    if (updates.previewImage !== undefined) updateData.previewImage = updates.previewImage;
     if (updates.videoUrl) updateData.videoUrl = updates.videoUrl;
     if (updates.githubUrl) updateData.githubUrl = updates.githubUrl;
     if (updates.liveUrl) updateData.liveUrl = updates.liveUrl;

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Project } from '@/types/project';
 
 export default function ProjectsSection() {
@@ -161,14 +162,26 @@ export default function ProjectsSection() {
                 key={project.id}
                 className="bg-secondary/20 p-6 rounded-lg border border-border hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-105"
               >
-                {/* Project Image Placeholder */}
-                <div className="h-48 bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
-                  <span className="text-muted-foreground text-sm">
-                    {project.images && project.images.length > 0 
-                      ? `${project.images.length} images` 
-                      : 'No images'
-                    }
-                  </span>
+                {/* Project Preview Image */}
+                <div className="h-48 bg-muted/50 rounded-lg mb-4 overflow-hidden">
+                  {project.previewImage ? (
+                    <Image
+                      src={project.previewImage}
+                      alt={project.title}
+                      width={400}
+                      height={192}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-muted-foreground text-sm">
+                        {project.images && project.images.length > 0 
+                          ? `${project.images.length} images` 
+                          : 'No preview image'
+                        }
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Project Header */}

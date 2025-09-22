@@ -11,6 +11,7 @@ services:
       - DATABASE_URL=postgresql://portfolio:portfolio123@postgres:5432/portfolio
     volumes:
       - ./public:/app/public:ro
+      - portfolio-data:/app/uploads
     restart: unless-stopped
     depends_on:
       - postgres

@@ -13,22 +13,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Your Name - AI Engineer & Real-Time Graphics Developer",
+  title: `${process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name'} - AI Engineer & Real-Time Graphics Developer`,
   description: "Portfolio showcasing AI engineering expertise and real-time graphics development work.",
   keywords: ["AI Engineer", "Real-Time Graphics", "MCP Server", "AI Agents", "Ventuz", "Unreal Engine", "Riot Games", "NHL"],
-  authors: [{ name: "Your Name" }],
-  creator: "Your Name",
+  authors: [{ name: process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name' }],
+  creator: process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name',
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://yourwebsite.com",
-    title: "Your Name - AI Engineer & Real-Time Graphics Developer",
+    title: `${process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name'} - AI Engineer & Real-Time Graphics Developer`,
     description: "Portfolio showcasing AI engineering expertise and real-time graphics development work.",
-    siteName: "Your Name Portfolio",
+    siteName: `${process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name'} Portfolio`,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Your Name - AI Engineer & Real-Time Graphics Developer",
+    title: `${process.env.NEXT_PUBLIC_FULL_NAME || 'Your Name'} - AI Engineer & Real-Time Graphics Developer`,
     description: "Portfolio showcasing AI engineering expertise and real-time graphics development work.",
     creator: "@YourHandle",
   },

@@ -13,6 +13,7 @@ export interface Project {
   responsibilities: string[];
   impact?: string;
   images?: string[];
+  previewImage?: string;
   videoUrl?: string;
   githubUrl?: string;
   liveUrl?: string;

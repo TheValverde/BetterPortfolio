@@ -1,0 +1,21 @@
+services:
+  mcp-server:
+    build: .
+    ports:
+      - "${MCP_SERVER_PORT:-8019}:${MCP_SERVER_PORT:-8019}"
+    environment:
+      - PORTFOLIO_API_URL=${PORTFOLIO_API_URL}
+      - MCP_SERVER_NAME=${MCP_SERVER_NAME:-Hugo Portfolio Management Server}
+      - MCP_SERVER_PORT=${MCP_SERVER_PORT:-8019}
+      - MCP_SERVER_HOST=0.0.0.0
+    volumes:
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+    networks:
+      - betterportfolio_portfolio-dev-network
+    external_links:
+      - betterportfolio-portfolio-dev-1:portfolio-dev
+
+networks:
+  betterportfolio_portfolio-dev-network:
+    external: true

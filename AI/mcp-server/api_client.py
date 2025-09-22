@@ -46,7 +46,7 @@ class PortfolioAPIClient:
     async def get_projects_by_category(self, category: str) -> List[Dict[str, Any]]:
         """Get projects by category."""
         try:
-            response = await self.client.get(f"{self.base_url}/projects", params={"category": category})
+            response = await self.client.get(f"{self.base_url}/projects", params={"category": category, "limit": 1000})
             response.raise_for_status()
             data = response.json()
             return data.get("projects", [])
@@ -56,7 +56,7 @@ class PortfolioAPIClient:
     async def get_projects_by_technology(self, technology: str) -> List[Dict[str, Any]]:
         """Get projects by technology."""
         try:
-            response = await self.client.get(f"{self.base_url}/projects", params={"technology": technology})
+            response = await self.client.get(f"{self.base_url}/projects", params={"technology": technology, "limit": 1000})
             response.raise_for_status()
             data = response.json()
             return data.get("projects", [])
@@ -66,7 +66,7 @@ class PortfolioAPIClient:
     async def get_featured_projects(self) -> List[Dict[str, Any]]:
         """Get featured projects."""
         try:
-            response = await self.client.get(f"{self.base_url}/projects", params={"featured": "true"})
+            response = await self.client.get(f"{self.base_url}/projects", params={"featured": "true", "limit": 1000})
             response.raise_for_status()
             data = response.json()
             return data.get("projects", [])
@@ -76,7 +76,7 @@ class PortfolioAPIClient:
     async def search_projects(self, search_term: str) -> List[Dict[str, Any]]:
         """Search projects."""
         try:
-            response = await self.client.get(f"{self.base_url}/projects", params={"search": search_term})
+            response = await self.client.get(f"{self.base_url}/projects", params={"search": search_term, "limit": 1000})
             response.raise_for_status()
             data = response.json()
             return data.get("projects", [])
@@ -86,7 +86,7 @@ class PortfolioAPIClient:
     async def get_projects_by_status(self, status: str) -> List[Dict[str, Any]]:
         """Get projects by status."""
         try:
-            response = await self.client.get(f"{self.base_url}/projects", params={"status": status})
+            response = await self.client.get(f"{self.base_url}/projects", params={"status": status, "limit": 1000})
             response.raise_for_status()
             data = response.json()
             return data.get("projects", [])
@@ -96,12 +96,21 @@ class PortfolioAPIClient:
     async def get_projects_by_year(self, year: int) -> List[Dict[str, Any]]:
         """Get projects by year."""
         try:
-            response = await self.client.get(f"{self.base_url}/projects", params={"year": year})
+            response = await self.client.get(f"{self.base_url}/projects", params={"year": year, "limit": 1000})
             response.raise_for_status()
             data = response.json()
             return data.get("projects", [])
         except Exception as e:
             return [{"error": f"Failed to fetch projects by year: {str(e)}"}]
+    
+    async def get_recent_projects(self, limit: int = 5) -> Dict[str, Any]:
+        """Get the most recent projects based on end date, with ongoing projects first."""
+        try:
+            response = await self.client.get(f"{self.base_url}/projects/recent", params={"limit": limit})
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            return {"error": f"Failed to fetch recent projects: {str(e)}"}
     
     async def get_all_technologies(self) -> List[str]:
         """Get all unique technologies from projects."""

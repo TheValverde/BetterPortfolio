@@ -87,6 +87,7 @@ export async function getProjectsByCategory(category: string): Promise<Project[]
     const categoryMap: { [key: string]: ProjectCategory } = {
       'ai': 'AI',
       'real-time-graphics': 'REAL_TIME_GRAPHICS',
+      'real-time_graphics': 'REAL_TIME_GRAPHICS', // Support both formats
       'web': 'WEB',
       'mobile': 'MOBILE',
       'other': 'OTHER'
@@ -105,6 +106,23 @@ export async function getProjectsByCategory(category: string): Promise<Project[]
     return projects.map(convertPrismaProject);
   } catch (error) {
     console.error('Error fetching projects by category:', error);
+    return [];
+  }
+}
+
+export async function getRecentProjects(limit: number = 5): Promise<Project[]> {
+  try {
+    const projects = await prisma.project.findMany({
+      orderBy: [
+        { status: 'asc' }, // 'ongoing' comes before 'completed' alphabetically
+        { endDate: 'desc' }, // Most recent end dates first
+        { startDate: 'desc' } // Fallback to start date for projects with same end date
+      ],
+      take: limit
+    });
+    return projects.map(convertPrismaProject);
+  } catch (error) {
+    console.error('Error fetching recent projects:', error);
     return [];
   }
 }

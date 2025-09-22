@@ -29,6 +29,7 @@ mcp = FastMCP(
     - search_projects: Search projects by title, description, or technologies
     - get_projects_by_status: Filter by status (completed, ongoing, planned)
     - get_projects_by_year: Filter by project year
+    - get_recent_projects: Get most recent projects by end date (ongoing projects first)
     - get_all_technologies: List all technologies used across projects
     - get_all_categories: List all project categories
     - get_project_statistics: Get portfolio statistics and metrics
@@ -265,6 +266,25 @@ async def get_project_statistics() -> Dict[str, Any]:
 
 
 @mcp.tool()
+async def get_recent_projects(limit: int = 5) -> Dict[str, Any]:
+    """
+    Get the most recent projects based on end date, with ongoing projects being the most recent.
+    
+    Args:
+        limit: Number of recent projects to return (default: 5)
+        
+    Returns:
+        Dictionary containing recent projects list and metadata
+    """
+    try:
+        client = await get_api_client()
+        result = await client.get_recent_projects(limit)
+        return result
+    except Exception as e:
+        return {"error": f"Failed to retrieve recent projects: {str(e)}"}
+
+
+@mcp.tool()
 async def get_hugo_expertise_summary() -> Dict[str, Any]:
     """
     Get a comprehensive summary of Hugo's expertise and experience.
@@ -333,6 +353,7 @@ if __name__ == "__main__":
     print("- search_projects")
     print("- get_projects_by_status")
     print("- get_projects_by_year")
+    print("- get_recent_projects (most recent by end date)")
     print("- get_all_technologies")
     print("- get_all_categories")
     print("- get_project_statistics")

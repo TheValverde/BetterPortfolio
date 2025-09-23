@@ -4,6 +4,7 @@ import os
 import json
 from agno.agent import Agent
 from agno.models.openrouter import OpenRouter
+from agno.models.lmstudio import LMStudio
 from agno.tools.crawl4ai import Crawl4aiTools
 from agno.tools.mcp import MCPTools
 from fastapi import FastAPI, Request
@@ -69,12 +70,22 @@ async def create_portfolio_agent():
     # Initialize MCP tools
     mcp_tools = MCPTools(transport="streamable-http", url="http://192.168.0.3:8017/mcp")
     
+    # Connect to MCP server
+    await mcp_tools.connect()
+    
     # Create agent with all tools
     agent = Agent(
         name="Portfolio Agent",
-        model=OpenRouter(
-            id="x-ai/grok-4-fast:free",
-            api_key=os.getenv("OPENROUTER_API_KEY"),
+        # model=OpenRouter(
+        #     id="meta-llama/llama-3.3-70b-instruct",
+        #     api_key=os.getenv("OPENROUTER_API_KEY"),
+        #     temperature=0.7,
+        #     max_tokens=40000,
+        # ),
+        model=LMStudio(
+            id="openai/gpt-oss-20b",
+            base_url="http://192.168.0.103:1234/v1",
+            api_key="none",
             temperature=0.7,
             max_tokens=40000,
         ),
@@ -215,6 +226,12 @@ async def run_agui_server():
     async def health_check():
         """Health check endpoint."""
         return {"status": "healthy", "agent_ready": agent is not None}
+    
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        """Clean up MCP connection on shutdown."""
+        if mcp_tools:
+            await mcp_tools.close()
     
     print("✅ Agent created successfully!")
     print("✅ MCP tools initialized!")

@@ -9,3 +9,4 @@ pandas
 mcp
 fastapi
 uvicorn
+ag-ui-protocol

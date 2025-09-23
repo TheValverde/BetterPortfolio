@@ -7,6 +7,41 @@ interface ProjectDetailProps {
 }
 
 export default function ProjectDetail({ project }: ProjectDetailProps) {
+  // Function to parse markdown links and convert them to JSX
+  const parseMarkdownLinks = (text: string) => {
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkRegex.exec(text)) !== null) {
+      // Add text before the link
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      
+      // Add the link
+      parts.push(
+        <Link 
+          key={match.index}
+          href={match[2]} 
+          className="text-primary hover:text-primary/80 underline"
+        >
+          {match[1]}
+        </Link>
+      );
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+    
+    return parts.length > 0 ? parts : text;
+  };
+
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
       case 'ai':
@@ -121,7 +156,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
               </p>
               {project.longDescription && (
                 <p className="text-muted-foreground leading-relaxed">
-                  {project.longDescription}
+                  {parseMarkdownLinks(project.longDescription)}
                 </p>
               )}
             </div>

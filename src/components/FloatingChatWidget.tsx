@@ -19,12 +19,22 @@ interface FloatingChatWidgetProps {
 export default function FloatingChatWidget({ className = '' }: FloatingChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 'welcome',
+      content: "Hi! I'm Hugo's AI assistant. I can help you learn about his projects, experience, and skills. What would you like to know?",
+      role: 'assistant',
+      timestamp: new Date(),
+    },
+  ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Generate a consistent thread ID for this session
+  const [threadId] = useState(() => `thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -69,16 +79,22 @@ export default function FloatingChatWidget({ className = '' }: FloatingChatWidge
     setIsLoading(true);
 
     try {
-      // Create AG-UI compatible request
+      // Create AG-UI compatible request with conversation history
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
+      // Add the current user message to the history
+      conversationHistory.push({
+        role: 'user',
+        content: currentInput
+      });
+
       const requestData = {
-        thread_id: `thread_${Date.now()}`,
+        thread_id: threadId, // Use consistent thread ID for the session
         run_id: `run_${Date.now()}`,
-        messages: [
-          {
-            role: 'user',
-            content: currentInput
-          }
-        ],
+        messages: conversationHistory,
         tools: []
       };
 

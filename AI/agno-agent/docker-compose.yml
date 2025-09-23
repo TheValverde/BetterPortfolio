@@ -1,0 +1,15 @@
+services:
+  agno-agent:
+    build: .
+    ports:
+      - "8025:8025"
+    environment:
+      - LMSTUDIO_API_KEY=lm-studio
+      - MCP_SERVER_URL=http://192.168.0.3:8017
+    restart: unless-stopped
+    networks:
+      - betterportfolio_portfolio-dev-network
+
+networks:
+  betterportfolio_portfolio-dev-network:
+    external: true

@@ -132,12 +132,26 @@ async def event_generator(agent: Agent, input_data: RunAgentInput) -> AsyncGener
             run_id=input_data.run_id
         ))
         
-        # Get the latest message from the input
+        # Get the conversation history from the input
         if not input_data.messages:
             raise ValueError("No messages provided")
         
+        # Build conversation context from the message history
+        conversation_context = ""
+        for msg in input_data.messages:
+            if isinstance(msg, dict):
+                role = msg.get('role', 'user')
+                content = msg.get('content', '')
+                if role == 'user':
+                    conversation_context += f"User: {content}\n"
+                elif role == 'assistant':
+                    conversation_context += f"Assistant: {content}\n"
+            else:
+                conversation_context += f"User: {str(msg)}\n"
+        
+        # Get the latest user message for the current request
         latest_message = input_data.messages[-1]
-        user_message = latest_message.get('content', '') if isinstance(latest_message, dict) else str(latest_message)
+        current_user_message = latest_message.get('content', '') if isinstance(latest_message, dict) else str(latest_message)
         
         # Generate message ID
         message_id = str(uuid.uuid4())
@@ -149,8 +163,21 @@ async def event_generator(agent: Agent, input_data: RunAgentInput) -> AsyncGener
             message_id=message_id
         ))
         
-        # Get response from agent
-        response = await agent.arun(user_message)
+        # Create a context-aware prompt that includes conversation history
+        if len(input_data.messages) > 1:
+            # Multi-turn conversation - include context
+            context_prompt = f"""Previous conversation context:
+{conversation_context}
+
+Current user message: {current_user_message}
+
+Please respond to the current user message while being aware of the conversation context above."""
+        else:
+            # First message - no context needed
+            context_prompt = current_user_message
+        
+        # Get response from agent with conversation context
+        response = await agent.arun(context_prompt)
         response_text = response.content if hasattr(response, 'content') else str(response)
         
         # Stream the response in chunks

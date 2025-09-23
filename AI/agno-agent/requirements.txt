@@ -1,0 +1,11 @@
+agno
+openai
+python-dotenv
+crawl4ai
+playwright
+beautifulsoup4
+requests
+pandas
+mcp
+fastapi
+uvicorn

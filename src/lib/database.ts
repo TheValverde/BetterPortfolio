@@ -134,7 +134,20 @@ export async function searchProjects(query: string): Promise<Project[]> {
         OR: [
           { title: { contains: query, mode: 'insensitive' } },
           { description: { contains: query, mode: 'insensitive' } },
-          { technologies: { has: query } }
+          { longDescription: { contains: query, mode: 'insensitive' } },
+          { client: { contains: query, mode: 'insensitive' } },
+          { role: { contains: query, mode: 'insensitive' } },
+          { impact: { contains: query, mode: 'insensitive' } },
+          { 
+            responsibilities: {
+              hasSome: [query]
+            }
+          },
+          {
+            technologies: {
+              hasSome: [query]
+            }
+          }
         ]
       },
       orderBy: { startDate: 'desc' }

@@ -112,8 +112,126 @@ class PortfolioAPIClient:
         except Exception as e:
             return {"error": f"Failed to fetch recent projects: {str(e)}"}
     
-    async def get_all_technologies(self) -> List[str]:
-        """Get all unique technologies from projects."""
+    def _categorize_technology_entry(self, entry: str) -> str:
+        """
+        Categorize a technology entry using pattern recognition and heuristics.
+        Returns: 'technology', 'tool', 'skill', 'responsibility', 'process', 'hardware', 'other'
+        """
+        entry_lower = entry.lower().strip()
+        
+        # Programming languages and frameworks (actual technologies)
+        tech_patterns = [
+            # Programming languages
+            r'\b(python|javascript|typescript|java|c\+\+|c#|swift|kotlin|go|rust|php|ruby|scala|r|matlab)\b',
+            # Web frameworks
+            r'\b(react|vue|angular|next\.js|nuxt|svelte|express|django|flask|fastapi|spring|laravel|rails)\b',
+            # Mobile frameworks
+            r'\b(react native|flutter|xamarin|ionic|cordova)\b',
+            # Databases
+            r'\b(mysql|postgresql|mongodb|redis|sqlite|elasticsearch|dynamodb)\b',
+            # Cloud platforms
+            r'\b(aws|azure|gcp|google cloud|heroku|vercel|netlify)\b',
+            # Version control
+            r'\b(git|github|gitlab|bitbucket)\b',
+            # Package managers
+            r'\b(npm|yarn|pip|conda|maven|gradle|composer|nuget)\b',
+            # Build tools
+            r'\b(webpack|vite|rollup|parcel|gulp|grunt)\b',
+            # Testing frameworks
+            r'\b(jest|mocha|cypress|selenium|pytest|junit|rspec)\b',
+            # AI/ML frameworks
+            r'\b(tensorflow|pytorch|keras|scikit-learn|pandas|numpy|opencv)\b',
+            # Real-time graphics
+            r'\b(unreal engine|unity|blender|maya|3ds max|houdini)\b',
+            # Containerization
+            r'\b(docker|kubernetes|podman)\b',
+            # Specific technologies mentioned
+            r'\b(mcp|model context protocol|fastmcp|prisma|tailwind|bootstrap)\b'
+        ]
+        
+        # Software tools and platforms
+        tool_patterns = [
+            r'\b(ventuz|after effects|premiere|figma|sketch|adobe|photoshop|illustrator)\b',
+            r'\b(disguise|notion|slack|discord|zoom|teams)\b',
+            r'\b(blender|maya|3ds max|houdini|cinema 4d)\b',
+            r'\b(visual studio|vscode|intellij|eclipse|sublime|atom)\b',
+            r'\b(postman|insomnia|swagger|openapi)\b'
+        ]
+        
+        # Skills and soft skills
+        skill_patterns = [
+            r'\b(leadership|teamwork|communication|project management|mentoring)\b',
+            r'\b(problem solving|critical thinking|analytical|creative)\b',
+            r'\b(collaboration|consulting|client interaction|stakeholder management)\b'
+        ]
+        
+        # Responsibilities and processes
+        responsibility_patterns = [
+            r'\b(ensuring|providing|creating|developing|implementing|maintaining)\b',
+            r'\b(coordinating|managing|optimizing|debugging|testing|deploying)\b',
+            r'\b(adapting|re-familiarizing|transitioning|allocating|triage)\b',
+            r'\b(writing|recording|editing|producing|programming for)\b',
+            r'\b(mentoring|training|teaching|guiding|supporting)\b',
+            r'\b(operating|running|executing|performing|conducting)\b',
+            r'\b(leading|directing|overseeing|supervising|monitoring)\b',
+            r'\b(collaborating|working with|interacting with|communicating with)\b'
+        ]
+        
+        # Hardware and systems
+        hardware_patterns = [
+            r'\b(custom hardware|touchscreen|kiosk|audio visual|av systems)\b',
+            r'\b(server|workstation|gpu|cpu|memory|storage)\b',
+            r'\b(projection|display|monitor|camera|microphone)\b'
+        ]
+        
+        # Check patterns (order matters - check responsibilities first)
+        import re
+        
+        # Check responsibilities first (they often contain technology names)
+        for pattern in responsibility_patterns:
+            if re.search(pattern, entry_lower):
+                return 'responsibility'
+        
+        # Check skills
+        for pattern in skill_patterns:
+            if re.search(pattern, entry_lower):
+                return 'skill'
+        
+        # Check hardware
+        for pattern in hardware_patterns:
+            if re.search(pattern, entry_lower):
+                return 'hardware'
+        
+        # Check tools
+        for pattern in tool_patterns:
+            if re.search(pattern, entry_lower):
+                return 'tool'
+        
+        # Check technologies last (to avoid false positives)
+        for pattern in tech_patterns:
+            if re.search(pattern, entry_lower):
+                return 'technology'
+        
+        # Additional heuristics
+        if len(entry) > 50:  # Very long entries are likely responsibilities
+            return 'responsibility'
+        
+        if any(word in entry_lower for word in ['for ', 'during ', 'with ', 'and ', 'or ']):
+            return 'responsibility'
+        
+        if entry_lower.startswith(('create', 'write', 'record', 'edit', 'ensure', 'provide')):
+            return 'responsibility'
+        
+        # Default to 'other' for unrecognized patterns
+        return 'other'
+
+    async def get_all_technologies(self, filter_type: str = 'all') -> List[str]:
+        """
+        Get all unique technologies from projects with optional filtering.
+        
+        Args:
+            filter_type: 'all', 'technology', 'tool', 'skill', 'responsibility', 'process', 'hardware', 'other'
+        """
         try:
             # Get all projects and extract technologies
             response = await self.client.get(f"{self.base_url}/projects", params={"limit": 1000})
@@ -121,14 +239,61 @@ class PortfolioAPIClient:
             data = response.json()
             projects = data.get("projects", [])
             
-            technologies = set()
+            all_entries = set()
             for project in projects:
                 if "technologies" in project and project["technologies"]:
-                    technologies.update(project["technologies"])
+                    all_entries.update(project["technologies"])
             
-            return sorted(list(technologies))
+            if filter_type == 'all':
+                return sorted(list(all_entries))
+            
+            # Filter by category
+            filtered_entries = []
+            for entry in all_entries:
+                category = self._categorize_technology_entry(entry)
+                if category == filter_type:
+                    filtered_entries.append(entry)
+            
+            return sorted(filtered_entries)
         except Exception as e:
             return [f"Error: {str(e)}"]
+
+    async def get_technology_categories(self) -> Dict[str, List[str]]:
+        """Get all technologies categorized by type."""
+        try:
+            # Get all projects and extract technologies
+            response = await self.client.get(f"{self.base_url}/projects", params={"limit": 1000})
+            response.raise_for_status()
+            data = response.json()
+            projects = data.get("projects", [])
+            
+            all_entries = set()
+            for project in projects:
+                if "technologies" in project and project["technologies"]:
+                    all_entries.update(project["technologies"])
+            
+            # Categorize all entries
+            categories = {
+                'technology': [],
+                'tool': [],
+                'skill': [],
+                'responsibility': [],
+                'process': [],
+                'hardware': [],
+                'other': []
+            }
+            
+            for entry in all_entries:
+                category = self._categorize_technology_entry(entry)
+                categories[category].append(entry)
+            
+            # Sort each category
+            for category in categories:
+                categories[category] = sorted(categories[category])
+            
+            return categories
+        except Exception as e:
+            return {"error": f"Failed to categorize technologies: {str(e)}"}
     
     async def get_all_categories(self) -> List[str]:
         """Get all unique categories from projects."""
@@ -164,12 +329,14 @@ class PortfolioAPIClient:
             ongoing_projects = len([p for p in projects if p.get("status") == "ongoing"])
             planned_projects = len([p for p in projects if p.get("status") == "planned"])
             
-            # Technology usage
+            # Technology usage (filtered to actual technologies only)
             technology_count = {}
             for project in projects:
                 if "technologies" in project and project["technologies"]:
                     for tech in project["technologies"]:
-                        technology_count[tech] = technology_count.get(tech, 0) + 1
+                        # Only count actual technologies, not responsibilities/skills
+                        if self._categorize_technology_entry(tech) == 'technology':
+                            technology_count[tech] = technology_count.get(tech, 0) + 1
             
             top_technologies = sorted(technology_count.items(), key=lambda x: x[1], reverse=True)[:10]
             

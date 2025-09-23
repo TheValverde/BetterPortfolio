@@ -225,19 +225,38 @@ async def get_projects_by_year(year: int) -> List[Dict[str, Any]]:
 
 
 @mcp.tool()
-async def get_all_technologies() -> List[str]:
+async def get_all_technologies(filter_type: str = 'all') -> List[str]:
     """
-    Get all unique technologies used across Hugo's projects.
+    Get all unique technologies used across Hugo's projects with optional filtering.
+    
+    Args:
+        filter_type: 'all', 'technology', 'tool', 'skill', 'responsibility', 'process', 'hardware', 'other'
     
     Returns:
-        List of all technologies Hugo has worked with
+        List of technologies/entries filtered by type
     """
     try:
         client = await get_api_client()
-        technologies = await client.get_all_technologies()
+        technologies = await client.get_all_technologies(filter_type=filter_type)
         return technologies
     except Exception as e:
         return [f"Error: {str(e)}"]
+
+
+@mcp.tool()
+async def get_technology_categories() -> Dict[str, List[str]]:
+    """
+    Get all technologies categorized by type (technology, tool, skill, etc.).
+    
+    Returns:
+        Dictionary with categories as keys and lists of entries as values
+    """
+    try:
+        client = await get_api_client()
+        categories = await client.get_technology_categories()
+        return categories
+    except Exception as e:
+        return {"error": f"Failed to categorize technologies: {str(e)}"}
 
 
 @mcp.tool()
@@ -314,8 +333,8 @@ async def get_hugo_expertise_summary() -> Dict[str, Any]:
         # Get basic statistics
         stats = await client.get_project_statistics()
         
-        # Get all technologies
-        technologies = await client.get_all_technologies()
+        # Get filtered technologies (actual technologies only)
+        technologies = await client.get_all_technologies(filter_type='technology')
         
         # Get featured projects for highlights
         featured_projects = await client.get_featured_projects()

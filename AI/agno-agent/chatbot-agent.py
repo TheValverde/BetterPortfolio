@@ -87,7 +87,7 @@ async def create_portfolio_agent():
             base_url="http://192.168.0.103:1234/v1",
             api_key="none",
             temperature=0.7,
-            max_tokens=40000,
+            max_tokens=69900,
         ),
         tools=[Crawl4aiTools(), mcp_tools],
         instructions="""

@@ -30,15 +30,52 @@ export default function FloatingChatWidget({ className = '' }: FloatingChatWidge
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [chatWidth, setChatWidth] = useState(384); // Default width: w-96 (384px)
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   
   // Generate a consistent thread ID for this session
   const [threadId] = useState(() => `thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
 
+  // Function to check if content contains tables and adjust width accordingly
+  const adjustChatWidthForContent = (content: string) => {
+    if (content.includes('|') && content.includes('---')) {
+      // Content contains a table, calculate optimal width
+      const lines = content.split('\n');
+      const tableLines = lines.filter(line => line.includes('|'));
+      
+      if (tableLines.length > 0) {
+        // Calculate the maximum line length
+        const maxLineLength = Math.max(...tableLines.map(line => line.length));
+        
+        // Calculate optimal width (character width * 8px + padding)
+        const optimalWidth = Math.min(
+          Math.max(maxLineLength * 8 + 100, 500), // Min 500px, add padding
+          window.innerWidth - 100 // Max: screen width - 100px margin
+        );
+        
+        setChatWidth(optimalWidth);
+      }
+    } else {
+      // No table detected, reset to default width
+      setChatWidth(384);
+    }
+  };
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Adjust chat width when messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === 'assistant' && lastMessage.content) {
+        adjustChatWidthForContent(lastMessage.content);
+      }
+    }
   }, [messages]);
 
   // Focus input when chat opens
@@ -219,9 +256,15 @@ export default function FloatingChatWidget({ className = '' }: FloatingChatWidge
 
   return (
     <div className={`fixed bottom-6 right-6 z-50 ${className}`}>
-      <div className={`bg-background border border-border rounded-lg shadow-xl transition-all duration-300 ${
-        isMinimized ? 'w-80 h-16' : 'w-96 h-[500px]'
-      }`}>
+      <div 
+        ref={chatContainerRef}
+        className={`bg-background border border-border rounded-lg shadow-xl transition-all duration-300 ${
+          isMinimized ? 'w-80 h-16' : 'h-[500px]'
+        }`}
+        style={{
+          width: isMinimized ? '320px' : `${chatWidth}px`
+        }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center space-x-2">
@@ -282,11 +325,9 @@ export default function FloatingChatWidget({ className = '' }: FloatingChatWidge
                           remarkPlugins={[remarkGfm]}
                           components={{
                             table: ({ children }) => (
-                              <div className="overflow-x-auto">
-                                <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
-                                  {children}
-                                </table>
-                              </div>
+                              <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
+                                {children}
+                              </table>
                             ),
                             th: ({ children }) => (
                               <th className="border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-2 py-1 text-left font-semibold">

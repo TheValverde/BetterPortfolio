@@ -136,10 +136,34 @@ export default function FloatingChatWidget({ className = '' }: FloatingChatWidge
       };
 
       // Determine the AG-UI server URL based on environment
-      // In Docker, we can connect to the host machine using host.docker.internal or the host IP
-      const aguiServerUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-        ? 'http://192.168.0.3:8025/'  // Local development
-        : 'http://192.168.0.3:8025/'; // Docker container connecting to host
+      const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+      let aguiServerUrl;
+      
+      if (hostname === 'localhost' || hostname === '192.168.0.3') {
+        // Local development
+        aguiServerUrl = 'http://192.168.0.3:8025/';
+      } else if (hostname === 'portfolio.hugovalverde.com') {
+        // Production - AI features disabled for now (no additional ports exposed)
+        aguiServerUrl = null; // Will show error message
+      } else if (hostname === 'staging-portfolio.hugovalverde.com') {
+        // Staging - AI features enabled via same domain path routing
+        aguiServerUrl = 'https://staging-portfolio.hugovalverde.com/agent/';
+      } else {
+        // Fallback
+        aguiServerUrl = 'http://192.168.0.3:8025/';
+      }
+
+      // Check if AI features are available
+      if (!aguiServerUrl) {
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: "AI chat features are currently disabled on this environment. Please visit the local development version for full AI functionality.",
+          role: 'assistant',
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, errorMessage]);
+        return;
+      }
 
       // Send request to AG-UI server
       const response = await fetch(aguiServerUrl, {

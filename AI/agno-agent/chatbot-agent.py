@@ -249,6 +249,12 @@ async def run_agui_server():
             }
         )
     
+    @app.post("/agent/")
+    async def agentic_chat_endpoint_agent(input_data: RunAgentInput, request: Request):
+        """AG-UI compatible agentic chat endpoint for /agent/ path (cloudflared routing)."""
+        # Simply call the same function as the root endpoint
+        return await agentic_chat_endpoint(input_data, request)
+    
     @app.get("/health")
     async def health_check():
         """Health check endpoint."""

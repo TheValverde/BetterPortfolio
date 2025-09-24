@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  portfolio-dev:
+    build: .
+    ports:
+      - "3018:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://portfolio_user:portfolio_password@postgres-dev:5432/portfolio_dev
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public:ro
+      - portfolio-data-dev:/app/uploads
+    depends_on:
+      - postgres-dev
+    networks:
+      - portfolio-dev-network
+
+  postgres-dev:
+    image: postgres:15-alpine
+    ports:
+      - "5438:5432"
+    environment:
+      - POSTGRES_DB=portfolio_dev
+      - POSTGRES_USER=portfolio_user
+      - POSTGRES_PASSWORD=portfolio_password
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - portfolio-dev-network
+
+volumes:
+  postgres_data_dev:
+  portfolio-data-dev:
+
+networks:
+  portfolio-dev-network:
+    driver: bridge

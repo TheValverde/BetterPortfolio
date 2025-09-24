@@ -220,3 +220,27 @@ test-prisma-api.js
 test-prisma.js
 test-security-simple.js
 test-security.js
+
+# MCP Server sensitive files
+AI/mcp-server/.env
+AI/mcp-server/.venv/
+AI/mcp-server/__pycache__/
+AI/mcp-server/*.pyc
+AI/mcp-server/*.pyo
+AI/mcp-server/*.pyd
+AI/mcp-server/.Python
+AI/mcp-server/build/
+AI/mcp-server/develop-eggs/
+AI/mcp-server/dist/
+AI/mcp-server/downloads/
+AI/mcp-server/eggs/
+AI/mcp-server/.eggs/
+AI/mcp-server/lib/
+AI/mcp-server/lib64/
+AI/mcp-server/parts/
+AI/mcp-server/sdist/
+AI/mcp-server/var/
+AI/mcp-server/wheels/
+AI/mcp-server/*.egg-info/
+AI/mcp-server/.installed.cfg
+AI/mcp-server/*.egg

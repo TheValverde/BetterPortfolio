@@ -12,10 +12,12 @@ services:
       - ./.env:/app/.env:ro
     restart: unless-stopped
     networks:
-      - betterportfolio_portfolio-dev-network
+      - ${PORTFOLIO_NETWORK:-betterportfolio_portfolio-dev-network}
     external_links:
-      - betterportfolio-portfolio-dev-1:portfolio-dev
+      - ${PORTFOLIO_SERVICE:-betterportfolio-portfolio-dev-1}:portfolio
 
 networks:
   betterportfolio_portfolio-dev-network:
+    external: true
+  betterportfolio_portfolio-network:
     external: true

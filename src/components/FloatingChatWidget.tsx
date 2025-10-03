@@ -143,8 +143,8 @@ export default function FloatingChatWidget({ className = '' }: FloatingChatWidge
         // Local development
         aguiServerUrl = 'http://192.168.0.3:8025/';
       } else if (hostname === 'portfolio.hugovalverde.com') {
-        // Production - AI features disabled for now (no additional ports exposed)
-        aguiServerUrl = null; // Will show error message
+        // Production - AI features enabled via same domain path routing
+        aguiServerUrl = 'https://portfolio.hugovalverde.com/agent/';
       } else if (hostname === 'staging-portfolio.hugovalverde.com') {
         // Staging - AI features enabled via same domain path routing
         aguiServerUrl = 'https://staging-portfolio.hugovalverde.com/agent/';

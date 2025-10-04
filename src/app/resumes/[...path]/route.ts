@@ -18,7 +18,13 @@ export async function GET(
       );
     }
 
-    const filePath = join(process.cwd(), 'uploads', fileName);
+    // First try to find the file in uploads directory
+    let filePath = join(process.cwd(), 'uploads', fileName);
+    
+    // If not found in uploads, try public/resumes directory
+    if (!existsSync(filePath)) {
+      filePath = join(process.cwd(), 'public', 'resumes', fileName);
+    }
     
     if (!existsSync(filePath)) {
       return NextResponse.json(
@@ -34,6 +40,9 @@ export async function GET(
     let contentType = 'application/octet-stream';
     
     switch (extension) {
+      case 'pdf':
+        contentType = 'application/pdf';
+        break;
       case 'jpg':
       case 'jpeg':
         contentType = 'image/jpeg';
@@ -47,20 +56,18 @@ export async function GET(
       case 'gif':
         contentType = 'image/gif';
         break;
-      case 'pdf':
-        contentType = 'application/pdf';
-        break;
     }
 
     return new NextResponse(fileBuffer, {
       headers: {
         'Content-Type': contentType,
+        'Content-Disposition': `attachment; filename="${fileName}"`,
         'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
       },
     });
 
   } catch (error) {
-    console.error('Error serving file:', error);
+    console.error('Error serving resume file:', error);
     return NextResponse.json(
       { error: 'Failed to serve file' },
       { status: 500 }

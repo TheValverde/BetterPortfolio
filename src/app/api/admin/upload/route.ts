@@ -39,11 +39,11 @@ export async function POST(request: NextRequest) {
       await mkdir(uploadsDir, { recursive: true });
     }
 
-    // Generate unique filename
+    // Generate unique filename while preserving original name structure
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 15);
     const fileExtension = file.name.split('.').pop();
-    const fileName = `${timestamp}-${randomString}.${fileExtension}`;
+    const baseName = file.name.replace(`.${fileExtension}`, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const fileName = `${baseName}_${timestamp}.${fileExtension}`;
     const filePath = join(uploadsDir, fileName);
 
     // Convert file to buffer and save

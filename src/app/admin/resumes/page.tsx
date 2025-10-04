@@ -107,7 +107,10 @@ export default function AdminResumesPage() {
       // Reset form
       setUploadFile(null);
       setDisplayName('');
-      (document.getElementById('file-upload') as HTMLInputElement).value = '';
+      const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');

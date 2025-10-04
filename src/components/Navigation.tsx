@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Download } from 'lucide-react';
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeResume, setActiveResume] = useState<{ filename: string; displayName: string } | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +16,28 @@ export default function Navigation() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Fetch active resume
+    const fetchActiveResume = async () => {
+      try {
+        const response = await fetch('/api/resume');
+        if (response.ok) {
+          const resume = await response.json();
+          setActiveResume(resume);
+        }
+      } catch (error) {
+        console.error('Failed to fetch active resume:', error);
+        // Fallback to default resume
+        setActiveResume({
+          filename: 'Hugo_Valverde_Resume_2025.pdf',
+          displayName: 'Resume'
+        });
+      }
+    };
+
+    fetchActiveResume();
   }, []);
 
   const navItems = [
@@ -54,6 +78,17 @@ export default function Navigation() {
                   {item.label}
                 </Link>
               ))}
+              {/* Resume Download Button */}
+              {activeResume && (
+                <a
+                  href={`/resumes/${activeResume.filename}`}
+                  download={activeResume.filename}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {activeResume.displayName}
+                </a>
+              )}
             </div>
           </div>
 
@@ -103,6 +138,18 @@ export default function Navigation() {
                   {item.label}
                 </Link>
               ))}
+              {/* Mobile Resume Download Button */}
+              {activeResume && (
+                <a
+                  href={`/resumes/${activeResume.filename}`}
+                  download={activeResume.filename}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 block px-3 py-2 rounded-md text-base font-medium transition-all duration-300 flex items-center gap-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Download className="h-4 w-4" />
+                  Download {activeResume.displayName}
+                </a>
+              )}
             </div>
           </div>
         )}

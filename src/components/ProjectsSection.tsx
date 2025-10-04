@@ -172,13 +172,18 @@ export default function ProjectsSection() {
                       height={192}
                       className="w-full h-full object-cover"
                     />
+                  ) : project.images && project.images.length > 0 ? (
+                    <Image
+                      src={project.images[0]}
+                      alt={project.title}
+                      width={400}
+                      height={192}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <span className="text-muted-foreground text-sm">
-                        {project.images && project.images.length > 0 
-                          ? `${project.images.length} images` 
-                          : 'No preview image'
-                        }
+                        No preview image
                       </span>
                     </div>
                   )}

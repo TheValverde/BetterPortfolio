@@ -26,6 +26,7 @@ model Project {
   responsibilities String[]
   impact           String?
   images           String[]
+  previewImage     String?   @map("preview_image")
   videoUrl         String?   @map("video_url")
   githubUrl        String?   @map("github_url")
   liveUrl          String?   @map("live_url")
@@ -88,4 +89,17 @@ model Admin {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("admins")
+}
+
+model Resume {
+  id          String   @id @default(cuid())
+  filename    String   @unique
+  displayName String   @map("display_name")
+  isActive    Boolean  @default(false) @map("is_active")
+  fileSize    Int?     @map("file_size") // in bytes
+  uploadedAt  DateTime @default(now()) @map("uploaded_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("resumes")
 }

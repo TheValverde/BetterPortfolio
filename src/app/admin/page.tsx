@@ -263,6 +263,12 @@ export default function AdminDashboard() {
             >
               Manage Projects
             </Link>
+            <Link
+              href="/admin/resumes"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"
+            >
+              Manage Resumes
+            </Link>
             <button
               onClick={() => fetchSubmissions()}
               className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"

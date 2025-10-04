@@ -1,4 +1,4 @@
-import { PrismaClient, ProjectStatus, ProjectCategory } from '@prisma/client';
+import { PrismaClient, ProjectStatus, ProjectCategory, Resume } from '@prisma/client';
 import { Project } from '@/types/project';
 
 const globalForPrisma = globalThis as unknown as {
@@ -346,5 +346,91 @@ export async function seedDatabase(): Promise<void> {
   } catch (error) {
     console.error('Error seeding database:', error);
     throw error;
+  }
+}
+
+// Resume Management Functions
+export async function getResumes(): Promise<Resume[]> {
+  try {
+    return await prisma.resume.findMany({
+      orderBy: { uploadedAt: 'desc' }
+    });
+  } catch (error) {
+    console.error('Error fetching resumes:', error);
+    throw error;
+  }
+}
+
+export async function getActiveResume(): Promise<Resume | null> {
+  try {
+    return await prisma.resume.findFirst({
+      where: { isActive: true }
+    });
+  } catch (error) {
+    console.error('Error fetching active resume:', error);
+    throw error;
+  }
+}
+
+export async function createResume(data: {
+  filename: string;
+  displayName: string;
+  fileSize?: number;
+}): Promise<Resume> {
+  try {
+    return await prisma.resume.create({
+      data
+    });
+  } catch (error) {
+    console.error('Error creating resume:', error);
+    throw error;
+  }
+}
+
+export async function updateResume(id: string, data: {
+  filename?: string;
+  displayName?: string;
+  isActive?: boolean;
+  fileSize?: number;
+}): Promise<Resume> {
+  try {
+    return await prisma.resume.update({
+      where: { id },
+      data
+    });
+  } catch (error) {
+    console.error('Error updating resume:', error);
+    throw error;
+  }
+}
+
+export async function setActiveResume(id: string): Promise<Resume> {
+  try {
+    // First, deactivate all resumes
+    await prisma.resume.updateMany({
+      where: { isActive: true },
+      data: { isActive: false }
+    });
+
+    // Then activate the selected resume
+    return await prisma.resume.update({
+      where: { id },
+      data: { isActive: true }
+    });
+  } catch (error) {
+    console.error('Error setting active resume:', error);
+    throw error;
+  }
+}
+
+export async function deleteResume(id: string): Promise<boolean> {
+  try {
+    await prisma.resume.delete({
+      where: { id }
+    });
+    return true;
+  } catch (error) {
+    console.error('Error deleting resume:', error);
+    return false;
   }
 }
